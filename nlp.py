@@ -8,6 +8,9 @@ from sklearn.neighbors import KNeighborsClassifier
 # Load Whisper model (for audio transcription)
 model = whisper.load_model("large-v3")
 
+# Load the sentiment analysis pipeline
+sentiment_pipeline = pipeline("sentiment-analysis")
+
 # Sample pitch categories
 CATEGORIES = ["AI", "Blockchain", "Agriculture", "FinTech", "FMCG", "Food Ventures", "Other"]
 
@@ -71,10 +74,23 @@ def classify_pitch(text):
     category = classifier.predict(text_vectorized)[0]
     return category
 
+def is_abusive(text, threshold=0.8):
+    """Checks if the text is abusive using sentiment analysis."""
+    result = sentiment_pipeline(text)[0]
+    # print(result)
+    # If the 'label' is 'NEGATIVE' and the score is above the threshold, consider it abusive
+    if result['label'] == 'NEGATIVE' and result['score'] > threshold:
+        return True
+    return False
+
 def generate_captions(video_path, output_srt="captionsnlp.srt"):
     """Generates captions and classifies the pitch topic."""
     audio_file = extract_audio(video_path)
     transcript = transcribe_audio(audio_file)
+    
+    if is_abusive(transcript):
+        print("⚠️ Abusive language detected. Captions will not be generated.")
+        return  # Stop the function if abusive language is detected
     
     pitch_category = classify_pitch(transcript)
 
