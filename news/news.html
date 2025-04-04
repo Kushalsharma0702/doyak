@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance News App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .news-item {
+            border-bottom: 1px solid #ccc;
+            padding: 15px 0;
+            }
+            .news-item {
+                border-bottom: 1px solid #ccc;
+                padding: 15px 0;
+                transition: transform 0.3s ease; /* Add transition for smooth animation */
+            }
+            .news-item:hover {
+                transform: translateY(-5px); /* Slight lift on hover */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+                cursor: pointer; /* Change cursor to pointer on hover */
+            }
+            .news-item:last-child {
+                border-bottom: none;
+            }
+            .news-image {
+                width: 120px;
+                height: 120px;
+                margin-right: 15px;
+                object-fit: cover;
+                border-radius: 8px; /* Rounded corners for images */
+            }
+            .news-content {
+                flex: 1;
+            }
+            .news-title {
+                font-size: 1.2em;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            .news-description {
+                font-size: 0.9em;
+                color: #555;
+            }
+            .news-link {
+                display: inline-block;
+                margin-top: 10px;
+                color: #007bff;
+                text-decoration: none;
+            }
+            .news-link:hover {
+                text-decoration: underline;
+            }
+            .error-message {
+                color: red;
+                text-align: center;
+                margin-top: 20px;
+            }
+            .booming-topics {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-top: 20px;
+                background: #f9f9f9;
+                padding: 10px;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+            .booming-topics h2 {
+                font-size: 1.1em;
+                margin-bottom: 5px;
+            }
+            .booming-topics ul {
+                list-style: none;
+                padding: 0;
+            }
+            .booming-topics li {
+                padding: 5px 0;
+                border-bottom: 1px solid #eee;
+            }
+            .booming-topics li:last-child {
+                border-bottom: none;
+            }
+            .booming-topics a {
+                text-decoration: none;
+                color: #333;
+            }
+            .booming-topics a:hover {
+                color: #007bff;
+            }
+            .news-card-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+            }
+            .news-card {
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .news-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+            .news-card img {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+            }
+            .news-card-content {
+                padding: 15px;
+            }
+            .news-card-title {
+                font-size: 1.1em;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            .news-card-description {
+                font-size: 0.9em;
+                color: #555;
+            }
+            @media (max-width: 768px) {
+                .booming-topics {
+                    position: relative;
+                    top: auto;
+                    right: auto;
+                    margin-top: 20px;
+                }
+            }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+            <h1>Trending Finance News</h1>
+            
+            <div class="booming-topics">
+                <h2>Booming Topics</h2>
+                <ul>
+                <li><a href="#">Artificial Intelligence</a></li>
+                <li><a href="#">Clean Energy Investments</a></li>
+                <li><a href="#">Space Exploration Funding</a></li>
+                <li><a href="#">Biotech Innovations</a></li>
+                </ul>
+            </div>
+
+            <div id="news-list" class="news-card-container">
+                Loading news...
+            </div>
+            <div id="error-message" class="error-message"></div>
+            </div>
+
+            <script>
+            const apiKey = '83b9e891b39f4efa8a8f20ea96d69741'; // Replace with your API key
+            const apiUrl = `https://newsapi.org/v2/everything?q=(finance AND startups AND (booming tech OR investment))&language=en&sortBy=publishedAt&apiKey=${apiKey}`;
+
+            async function fetchNews() {
+                try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (!data.articles || data.articles.length === 0) {
+                    throw new Error('No news articles found.');
+                }
+                const newsList = document.getElementById('news-list');
+                newsList.innerHTML = '';
+
+                data.articles.slice(0, 5).forEach(article => {
+                    const newsCard = document.createElement('div');
+                    newsCard.classList.add('news-card');
+
+                    newsCard.addEventListener('click', () => {
+                    window.open(article.url, '_blank');
+                    });
+
+                    const imageUrl = article.urlToImage || 'placeholder-image.jpg';
+
+                    newsCard.innerHTML = `
+                    <img src="${imageUrl}" alt="News Image">
+                    <div class="news-card-content">
+                        <div class="news-card-title">${article.title}</div>
+                        <div class="news-card-description">${article.description || 'No description available.'}</div>
+                    </div>
+                    `;
+                    newsList.appendChild(newsCard);
+                });
+                } catch (error) {
+                console.error('Error fetching news:', error);
+                document.getElementById('error-message').textContent = `Error fetching news: ${error.message}`;
+                }
+            }
+
+            fetchNews();
+            </script>
+        </body>
+        </html>
